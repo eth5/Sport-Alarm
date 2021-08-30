@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Sport Alarm</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="pause">Pause</string>
+    <string name="config">Config</string>
+    <string name="lap">Lap</string>
+    <string name="off">Off</string>
+    <string name="work_time">Work time</string>
+    <string name="pause_time">Pause time</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
+</resources>
