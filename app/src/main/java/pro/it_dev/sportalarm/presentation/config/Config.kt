@@ -42,7 +42,9 @@ fun ConfigDialog(configViewModel: ConfigViewModel = viewModel(), onDismissReques
 	){
 		Box(modifier = Modifier
 			.fillMaxHeight(0.8f)
-			.fillMaxWidth(1f),
+			.fillMaxWidth(1f)
+			.border(1.dp,MaterialTheme.colors.secondary, RoundedCornerShape(10.dp))
+			,
 			contentAlignment = Center
 		){
 			var size by remember {
