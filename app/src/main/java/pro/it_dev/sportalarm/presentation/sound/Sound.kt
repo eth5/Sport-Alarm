@@ -2,15 +2,9 @@ package pro.it_dev.sportalarm.presentation.sound
 
 import android.content.Context
 import android.media.SoundPool
+import pro.it_dev.sportalarm.domain.Clock
 
 class Sound() {
-	companion object{
-		const val BEEP = "raw/beep.ogg"
-		const val START = "raw/start.mp3"
-		const val RELAX = "raw/relax.mp3"
-		const val PAUSE = "raw/pause.ogg"
-		const val WHISTLE = "raw/whistle.ogg"
-	}
 	private val sp = SoundPool
 		.Builder()
 		.setMaxStreams(3)

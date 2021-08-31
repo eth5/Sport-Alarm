@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import pro.it_dev.sportalarm.domain.Clock
+import pro.it_dev.sportalarm.presentation.sound.ClockFx
 import pro.it_dev.sportalarm.presentation.sound.Sound
 import pro.it_dev.sportalarm.presentation.sound.SoundEvent
 import pro.it_dev.sportalarm.settings.Setting
@@ -53,14 +54,18 @@ class ClockViewModel: ViewModel() {
 		clock = Setting.getClockSetting().also {
 			_laps.value = it.laps
 		}
+		ClockFx.setClockFxEnableState(clock)
 	}
 	private var job: Job?=null
+
 	fun start(){
 		viewModelScope.launch {
 			resetClockViewModelValues()
 			job?.cancelAndJoin()
 
-			soundEvent.value = SoundEvent(listOf(Sound.WHISTLE,Sound.START))
+
+			soundEvent.value = SoundEvent(listOf(ClockFx.Whistle))
+			delay(1000)
 
 			val job = viewModelScope.launch (Dispatchers.Default){
 				_currenLap.value = 0
@@ -68,14 +73,15 @@ class ClockViewModel: ViewModel() {
 
 				while (currenLap.value < laps.value){
 					_currenLap.value++
-					clockState.value = ClockState.InRun
 
-					loop(clock.min*60L+clock.sec, _timeText)
+					clockState.value = ClockState.InRun
+					soundEvent.value = SoundEvent(listOf(ClockFx.Start))
+					loop(clock.workTime, _timeText)
 
 					clockState.value = ClockState.InRelax
-					loop(clock.pauseMin*60L+clock.pauseSec, _timeText)
+					soundEvent.value = SoundEvent(listOf(ClockFx.Relax))
+					loop(clock.pauseTime, _timeText)
 				}
-
 				resetClockViewModelValues()
 			}
 			job.invokeOnCompletion {
@@ -101,7 +107,7 @@ class ClockViewModel: ViewModel() {
 				}
 			}
 			state.value = longTimeToStringTime(time)
-			if (time in 0..3) soundEvent.value = SoundEvent(listOf(Sound.BEEP))
+			if (time in 0..3) soundEvent.value = SoundEvent(listOf(ClockFx.Beep))
 		}
 	}
 

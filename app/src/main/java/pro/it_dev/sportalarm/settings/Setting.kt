@@ -5,12 +5,10 @@ import android.content.SharedPreferences
 import pro.it_dev.sportalarm.domain.Clock
 
 object Setting {
-	private const val INIT_KEY = "initialed"
 	private const val LAPS = "laps"
-	private const val MIN = "min"
-	private const val SEC = "sec"
-	private const val PAUSE_MIN = "pause_min"
-	private const val PAUSE_SEC = "pause_sec"
+	private const val WORK_TIME = "pause_time"
+	private const val PAUSE_TIME = "work_time"
+	private const val BEEP = "beep"
 	private const val WHISTLING = "whistling"
 	private const val VOICE = "voice"
 
@@ -23,23 +21,23 @@ object Setting {
 	fun getClockSetting():Clock{
 		return Clock().apply {
 			laps = config.getInt(LAPS, 1)
-			min = config.getInt(MIN, 1)
-			sec = config.getInt(SEC, 0)
-			pauseMin = config.getInt(PAUSE_MIN, 0)
-			pauseSec = config.getInt(PAUSE_SEC, 20)
 			whistling = config.getBoolean(WHISTLING, true)
 			voice = config.getBoolean(VOICE, true)
+			beep = config.getBoolean(BEEP, true)
+
+			workTime = config.getLong(WORK_TIME, 60)
+			pauseTime = config.getLong(PAUSE_TIME, 20)
 		}
 	}
 	fun saveClockSetting(clock: Clock){
 		val editor = config.edit()
 		editor.putInt(LAPS, clock.laps)
-		editor.putInt(MIN, clock.min)
-		editor.putInt(SEC, clock.sec)
-		editor.putInt(PAUSE_MIN, clock.pauseMin)
-		editor.putInt(PAUSE_SEC, clock.pauseSec)
 		editor.putBoolean(WHISTLING, clock.whistling)
 		editor.putBoolean(VOICE, clock.voice)
+		editor.putBoolean(BEEP, clock.beep)
+
+		editor.putLong(WORK_TIME,clock.workTime)
+		editor.putLong(PAUSE_TIME,clock.pauseTime)
 		editor.apply()
 	}
 

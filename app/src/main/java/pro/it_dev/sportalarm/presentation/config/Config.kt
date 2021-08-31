@@ -30,12 +30,11 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pro.it_dev.sportalarm.R
 import pro.it_dev.sportalarm.domain.Clock
-import pro.it_dev.sportalarm.presentation.screens.animationDp
 import pro.it_dev.sportalarm.util.Resource
 
 
 @Composable
-fun ConfigDialog(configViewModel: ConfigViewModel = viewModel(), onDismissRequest:()->Unit) {
+fun ConfigDialog(viewModel: ConfigViewModel = viewModel(), onDismissRequest:()->Unit) {
 	Dialog(
 		onDismissRequest = onDismissRequest,
 		properties = DialogProperties(dismissOnClickOutside = true)
@@ -43,7 +42,7 @@ fun ConfigDialog(configViewModel: ConfigViewModel = viewModel(), onDismissReques
 		Box(modifier = Modifier
 			.fillMaxHeight(0.8f)
 			.fillMaxWidth(1f)
-			.border(1.dp,MaterialTheme.colors.secondary, RoundedCornerShape(10.dp))
+			.border(1.dp, MaterialTheme.colors.secondary, RoundedCornerShape(10.dp))
 			,
 			contentAlignment = Center
 		){
@@ -72,8 +71,8 @@ fun ConfigDialog(configViewModel: ConfigViewModel = viewModel(), onDismissReques
 						.padding(start = 5.dp)
 						.align(CenterHorizontally)
 				)
-				val clockState by produceState<Resource<Clock>>(initialValue = Resource.Loading()){
-					value = configViewModel.getClock()
+				val clockState by produceState<Resource<Boolean>>(initialValue = Resource.Loading()){
+					value = viewModel.getClock()
 				}
 				Box(
 					modifier = Modifier
@@ -85,7 +84,7 @@ fun ConfigDialog(configViewModel: ConfigViewModel = viewModel(), onDismissReques
 				){
 					when(clockState){
 						is Resource.Loading -> CircularProgressIndicator()
-						is Resource.Success -> ConfigSetting(clockState.data!!, configViewModel)
+						is Resource.Success -> ConfigSetting(viewModel)
 						is Resource.Error -> Text(text = clockState.message ?: "Unknown error", color = Color.Red)
 					}
 				}
@@ -96,7 +95,7 @@ fun ConfigDialog(configViewModel: ConfigViewModel = viewModel(), onDismissReques
 				){
 					TextButton(
 						onClick = {
-							configViewModel.saveClock(clockState.data!!)
+							viewModel.saveClock()
 							onDismissRequest()
 						},
 						enabled = clockState is Resource.Success,
@@ -120,7 +119,7 @@ fun ConfigDialog(configViewModel: ConfigViewModel = viewModel(), onDismissReques
 }
 
 @Composable
-fun ConfigSetting(clock: Clock, configViewModel: ConfigViewModel) {
+fun ConfigSetting(viewModel: ConfigViewModel) {
 	Column(
 		modifier = Modifier
 			.verticalScroll(rememberScrollState())
@@ -129,114 +128,111 @@ fun ConfigSetting(clock: Clock, configViewModel: ConfigViewModel) {
 		verticalArrangement = Arrangement.Center
 	) {
 		EditField(
-			value = clock.laps,
+			stateValue = viewModel.laps,
 			label = { Text(text = "Laps") },
 			keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 			onChangeSetter = {
-				clock.laps = configViewModel.convertStringValueToInt(it).coerceIn(1,1000)
-				clock.laps
+				if (it.length < 9) viewModel.laps.value = viewModel.convertStringValueToInt(it)
 			}
 		)
 		Text(text = LocalContext.current.getString(R.string.work_time))
 		Row (verticalAlignment = Alignment.CenterVertically){
 			EditField(
-				value = clock.min,
+				stateValue = viewModel.min,
 				label = { Text(text = "Min") },
 				modifier = Modifier.weight(1f),
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 				onChangeSetter = {
-					clock.min = configViewModel.convertStringValueToInt(it).coerceIn(0,59)
-					clock.min
+					if (it.length < 9) viewModel.min.value = viewModel.convertStringValueToLong(it)
 				}
 			)
 			Text(text = ":")
 			EditField(
-				value = clock.sec,
+				stateValue = viewModel.sec,
 				label = { Text(text = "Sec") },
 				modifier = Modifier.weight(1f),
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 				onChangeSetter = {
-					clock.sec = configViewModel.convertStringValueToInt(it).coerceIn(0,59)
-					clock.sec
+					if (it.length < 9) viewModel.sec.value = viewModel.convertStringValueToLong(it)
 				}
 			)
 		}
 		Text(text = LocalContext.current.getString(R.string.pause_time))
 		Row (verticalAlignment = Alignment.CenterVertically){
 			EditField(
-				value = clock.pauseMin,
+				stateValue = viewModel.pauseMin,
 				label = { Text(text = "Min") },
 				modifier = Modifier.weight(1f),
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-				onChangeSetter = {
-					clock.pauseMin = configViewModel.convertStringValueToInt(it).coerceIn(0,59)
-					clock.pauseMin
-				}
+				onChangeSetter = { if (it.length < 9) viewModel.pauseMin.value = viewModel.convertStringValueToLong(it) }
 			)
 			Text(text = ":")
 			EditField(
-				value = clock.pauseSec,
+				stateValue = viewModel.pauseSec,
 				label = { Text(text = "Sec") },
 				modifier = Modifier.weight(1f),
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-				onChangeSetter = {
-					clock.pauseSec = configViewModel.convertStringValueToInt(it).coerceIn(0,59)
-					clock.pauseSec
-				}
+				onChangeSetter = { if (it.length < 9) viewModel.pauseSec.value = viewModel.convertStringValueToLong(it) }
 			)
 		}
 		LabeledCheckBox(
-			value = clock.whistling,
+			value = viewModel.whistling,
 			label = "Whistling",
 			modifier = Modifier
 				.align(Start)
 				.padding(10.dp),
-			onChange = { clock.whistling = it; it })
+			onChange = { viewModel.whistling.value = it })
 		LabeledCheckBox(
-			value = clock.voice,
+			value = viewModel.voice,
 			label = "Voice",
 			modifier = Modifier
 				.align(Start)
 				.padding(10.dp),
-			onChange = { clock.voice = it; it })
+			onChange = { viewModel.voice.value = it })
+		LabeledCheckBox(
+			value = viewModel.beep,
+			label = "Beep",
+			modifier = Modifier
+				.align(Start)
+				.padding(10.dp),
+			onChange = { viewModel.beep.value = it })
 
 	}
 }
 
 @Composable
-fun LabeledCheckBox(value:Boolean, label:String, modifier: Modifier = Modifier, onChange:(Boolean)->Boolean) {
+fun LabeledCheckBox(value:State<Boolean>, label:String, modifier: Modifier = Modifier, onChange:(Boolean)->Unit) {
 	Row(modifier = modifier) {
-		var isChecked by remember { mutableStateOf(value) }
-		Checkbox(checked = isChecked, onCheckedChange = { isChecked = onChange(it) })
+		val isChecked by remember { value }
+		Checkbox(checked = isChecked, onCheckedChange = { onChange(it) })
 		Text(text = label)
 	}
 }
 
 @Composable
 fun <T>EditField(
-	value:T,
+	stateValue:State<T>,
 	adapter:(T)->String = { it.toString() },
 	label: @Composable (() -> Unit)? = null,
 	modifier: Modifier = Modifier,
 	fontSize: TextUnit = 18.sp,
 	maxLines:Int = 1,
 	keyboardOptions: KeyboardOptions = KeyboardOptions (),
-	onChangeSetter: (String)->T
+	onChangeSetter: (String)->Unit
 ){
-	var stateValue by remember { mutableStateOf(value) }
+	val stateValue by remember { stateValue }
 	var size by remember { mutableStateOf(0.8f) }
 	var borderSize by remember { mutableStateOf(1.dp) }
 
 	TextField(
 		value = adapter(stateValue),
 		label = label,
-		onValueChange = { stateValue = onChangeSetter(it) },
+		onValueChange = { onChangeSetter(it) },
 		modifier = modifier
 			.padding(horizontal = 2.dp, vertical = 2.dp)
-			//.fillMaxWidth(size)
 			.border(borderSize, MaterialTheme.colors.secondary, CircleShape)
 			.shadow(2.dp, CircleShape)
-			.background(color = Color.White, CircleShape)
+			.background(color = MaterialTheme.colors.background, CircleShape)
 			.onFocusChanged {
 				if (it.isFocused) {
 					size = 0.9f

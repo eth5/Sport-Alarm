@@ -1,7 +1,10 @@
 package pro.it_dev.sportalarm.presentation.screens
 
 import android.graphics.BitmapFactory
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,7 +13,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,16 +26,12 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import pro.it_dev.sportalarm.R
 import pro.it_dev.sportalarm.presentation.config.ConfigDialog
 import pro.it_dev.sportalarm.presentation.sound.Sound
 
@@ -137,7 +139,7 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 	if (soundEvent != null) {
 		LaunchedEffect(key1 = soundEvent) {
 			soundEvent!!.list.forEach {
-				sound.play(it, soundEvent!!.rate)
+				if (it.enable) sound.play(it.path, soundEvent!!.rate)
 			}
 		}
 	}

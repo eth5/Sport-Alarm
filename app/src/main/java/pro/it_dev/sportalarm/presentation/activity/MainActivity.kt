@@ -25,6 +25,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import pro.it_dev.sportalarm.ad.AdBannerUtil
 import pro.it_dev.sportalarm.presentation.privacy.PrivacyDialog
 import pro.it_dev.sportalarm.presentation.screens.ClockScreen
+import pro.it_dev.sportalarm.presentation.sound.ClockFx
 import pro.it_dev.sportalarm.presentation.sound.Sound
 import pro.it_dev.sportalarm.presentation.ui.theme.SportAlarmTheme
 
@@ -35,11 +36,11 @@ class MainActivity : ComponentActivity() {
 
 		sound = Sound()
 		sound.load(
-			Sound.BEEP,
-			Sound.START,
-			Sound.PAUSE,
-			Sound.RELAX,
-			Sound.WHISTLE,
+			ClockFx.Beep.path,
+			ClockFx.Whistle.path,
+			ClockFx.Start.path,
+			ClockFx.Pause.path,
+			ClockFx.Relax.path,
 			ctx = baseContext
 		)
 
