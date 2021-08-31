@@ -19,7 +19,7 @@ class ConfigViewModel: ViewModel() {
 	val beep = mutableStateOf(false)
 
 
-	suspend fun getClock():Resource<Boolean>{
+	fun getClock():Resource<Boolean>{
 		val clock = Setting.getClockSetting()
 		laps.value = clock.laps
 		min.value = clock.workTime / 60
@@ -28,6 +28,7 @@ class ConfigViewModel: ViewModel() {
 		pauseSec.value = clock.pauseTime % 60
 		whistling.value = clock.whistling
 		voice.value = clock.voice
+		beep.value = clock.beep
 
 		return Resource.Success(true)
 	}
