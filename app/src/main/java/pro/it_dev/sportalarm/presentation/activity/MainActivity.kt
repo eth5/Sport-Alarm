@@ -57,15 +57,20 @@ class MainActivity : ComponentActivity() {
 						AndroidView(
 							factory = { ctx ->
 								val adUtil = AdBannerUtil()
-								val adView = adUtil.createBanner(ctx,"ca-app-pub-6127542757275882/1103625381")
+								val adView = adUtil.createBanner(
+									ctx,
+									"ca-app-pub-6127542757275882/1103625381"
+								)
 								adUtil.initialBanner(ctx, adView)
 								adView
 							},
 							modifier = Modifier.align(Alignment.TopCenter)
 						)
-						Privacy(modifier = Modifier
-							.align(Alignment.BottomCenter)
-							.padding(bottom = 8.dp))
+						Privacy(
+							modifier = Modifier
+								.align(Alignment.BottomCenter)
+								.padding(bottom = 8.dp)
+						)
 					}
 				}
 			}

@@ -65,6 +65,9 @@ dependencies {
 
     // compose
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha07")
+    // Material design icons
+    implementation("androidx.compose.material:material-icons-core:$compose_version")
+    implementation("androidx.compose.material:material-icons-extended:$compose_version")
 
     //admob
     implementation 'com.google.android.gms:play-services-ads:20.2.0'
