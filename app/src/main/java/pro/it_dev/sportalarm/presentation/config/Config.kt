@@ -123,8 +123,8 @@ fun ConfigDialog(viewModel: ConfigViewModel = viewModel(), onDismissRequest:()->
 @Composable
 fun ToastMessage(messageState: MutableState<Message?>) {
 	val message by remember { messageState }
-	val ctx = LocalContext.current
 	if (message != null) {
+		val ctx = LocalContext.current
 		DisposableEffect(message){
 			val toast = Toast.makeText(ctx, message?.text ?: "error msg", Toast.LENGTH_SHORT)
 			toast.show()
