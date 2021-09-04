@@ -1,22 +1,28 @@
 package pro.it_dev.sportalarm.presentation.config
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import pro.it_dev.sportalarm.domain.Clock
 import pro.it_dev.sportalarm.settings.Setting
+import pro.it_dev.sportalarm.util.Message
 import pro.it_dev.sportalarm.util.Resource
 
 class ConfigViewModel: ViewModel() {
+
+	val popUpMsg = mutableStateOf<Message?>(null)
 
 	val laps= mutableStateOf(0)
 	val min = mutableStateOf(0L)
 	val sec= mutableStateOf(0L)
 	val pauseMin= mutableStateOf(0L)
 	val pauseSec= mutableStateOf(0L)
-
+	private val _volume = mutableStateOf(0f)
+	val volume:State<Float> get() = _volume
 	val whistling = mutableStateOf(false)
 	val voice = mutableStateOf(false)
 	val beep = mutableStateOf(false)
+
 
 
 	fun getClock():Resource<Boolean>{
@@ -29,7 +35,7 @@ class ConfigViewModel: ViewModel() {
 		whistling.value = clock.whistling
 		voice.value = clock.voice
 		beep.value = clock.beep
-
+		_volume.value = clock.volume
 		return Resource.Success(true)
 	}
 	fun saveClock(){
@@ -37,6 +43,7 @@ class ConfigViewModel: ViewModel() {
 			laps = (this@ConfigViewModel.laps.value).coerceAtMost(99)
 			workTime = (this@ConfigViewModel.min.value * 60 + this@ConfigViewModel.sec.value).coerceAtMost(5999)
 			pauseTime = (this@ConfigViewModel.pauseMin.value * 60 + this@ConfigViewModel.pauseSec.value).coerceAtMost(5999)
+			volume = this@ConfigViewModel.volume.value.coerceIn(0f,1f)
 			whistling = this@ConfigViewModel.whistling.value
 			voice = this@ConfigViewModel.voice.value
 			beep = this@ConfigViewModel.beep.value
@@ -55,5 +62,10 @@ class ConfigViewModel: ViewModel() {
 		else filteredValue.toLong()
 	}
 
+	fun setVolume(volumeValue: Float){
+		_volume.value = volumeValue.coerceIn(0f,1f)
+		popUpMsg.value = Message("Volume ${(_volume.value * 100).toInt()}")
+		println("Volume ${(_volume.value * 100).toInt()}")
 
+	}
 }

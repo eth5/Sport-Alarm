@@ -9,7 +9,7 @@ sealed class ClockFx(val path:String, var enable:Boolean){
 	object Pause: ClockFx("raw/pause.ogg", true)
 	object Whistle: ClockFx("raw/whistle.ogg", true)
 	companion object{
-		fun setClockFxEnableState(clock: Clock){
+		fun updateSoundEnabledState(clock: Clock){
 			Whistle.enable = clock.whistling
 			Beep.enable = clock.beep
 

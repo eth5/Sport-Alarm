@@ -13,16 +13,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Alarm
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -32,8 +32,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import pro.it_dev.sportalarm.R
 import pro.it_dev.sportalarm.presentation.config.ConfigDialog
 import pro.it_dev.sportalarm.presentation.sound.Sound
+import pro.it_dev.sportalarm.presentation.sound.SoundEvent
 
 @Composable
 fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
@@ -60,6 +62,7 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 					.align(Alignment.BottomCenter),
 				contentAlignment = Alignment.Center
 			) {
+
 				Column(
 					modifier = Modifier,
 					verticalArrangement = Arrangement.Top,
@@ -99,8 +102,7 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 							.fillMaxWidth(0.7f)
 							.fillMaxHeight(0.4f)
 							.padding(start = 12.dp, end = 12.dp)
-							.drawWithContent { if (readyToDraw) drawContent() }
-						,
+							.drawWithContent { if (readyToDraw) drawContent() },
 						textAlign = TextAlign.Center,
 						style = LocalTextStyle.current.copy(
 							fontSize = LocalTextStyle.current.fontSize * multiplier
@@ -128,22 +130,37 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 	}
 
 	val showConfig by remember { viewModel.showConfig }
-	if (showConfig) ConfigDialog() {
+	if (showConfig) ConfigDialog {
 		viewModel.showConfig(false)
 		viewModel.resetClockViewModelValues()
 	}
 
+//	val soundEvent by remember {
+//		viewModel.soundEvent
+//	}
+//	if (soundEvent != null) {
+//		LaunchedEffect(key1 = soundEvent) {
+//			soundEvent!!.list.forEach {
+//				if (it.enable) sound.play(it.path, soundEvent!!.rate)
+//			}
+//		}
+//	}
+	PlaySoundEvent(soundEventState = viewModel.soundEvent, sound = sound)
+}
+
+@Composable
+fun PlaySoundEvent(soundEventState: State<SoundEvent?>, sound: Sound) {
 	val soundEvent by remember {
-		viewModel.soundEvent
+		soundEventState
 	}
 	if (soundEvent != null) {
 		LaunchedEffect(key1 = soundEvent) {
+			val volume = soundEvent!!.volume
 			soundEvent!!.list.forEach {
-				if (it.enable) sound.play(it.path, soundEvent!!.rate)
+				if (it.enable) sound.play(it.path,volume, soundEvent!!.rate)
 			}
 		}
 	}
-
 }
 
 @Composable
@@ -164,7 +181,6 @@ fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) 
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
-			//.background(MaterialTheme.colors.surface)
 			.height(
 				animationDp(
 					start = 0.dp, target = 100.dp, animationSpec = spring(
@@ -175,73 +191,44 @@ fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) 
 			.padding(5.dp),
 		verticalAlignment = Alignment.Top
 	) {
-
-		IconButton(
-			onClick = { viewModel.start() },
+		IconBottomButton(
+			imageVector = Icons.Default.PlayArrow,
+			contentDescription = "Play",
 			enabled = clockState == ClockState.Off,
-			modifier = Modifier
-				.weight(1f).padding(5.dp)
-				.background(MaterialTheme.colors.surface, CircleShape)
-		) {
-			Icon(
-				imageVector = Icons.Default.PlayArrow,
-				contentDescription = "Play"
-			)
-		}
-		IconButton(
-			onClick = { viewModel.pause() },
+			modifier = Modifier.weight(1f),
+			onClick = { viewModel.start() }
+		)
+		IconBottomButton(
+			imageVector = Icons.Default.Pause,
+			contentDescription = "Pause",
 			enabled = clockState != ClockState.Off,
-			modifier = Modifier
-				.weight(1f).padding(5.dp)
-				.background(MaterialTheme.colors.surface, CircleShape)
-		) {
-			Icon(
-				imageVector = Icons.Default.Pause,
-				contentDescription = "Play"
-			)
-		}
-		IconButton(
-			onClick = { viewModel.stop() },
+			modifier = Modifier.weight(1f),
+			onClick = { viewModel.pause() }
+		)
+		IconBottomButton(
+			imageVector = Icons.Default.Stop,
+			contentDescription = "Stop",
 			enabled = clockState != ClockState.Off,
-			modifier = Modifier
-				.weight(1f).padding(5.dp)
-				.background(MaterialTheme.colors.surface, CircleShape)
-		) {
-			Icon(imageVector = Icons.Default.Stop, contentDescription = "Stop")
-		}
+			modifier = Modifier.weight(1f),
+			onClick = { viewModel.stop() }
+		)
+	}
+}
 
-//		Button(
-//			modifier = Modifier
-//				.weight(1f)
-//				.padding(5.dp),
-//			onClick = {
-//				when (clockState) {
-//					ClockState.Off -> viewModel.start()
-//					ClockState.InRun, ClockState.InRelax, ClockState.InPause -> viewModel.stop()
-//				}
-//			}
-//		) {
-//			Text(
-//				text = (when (clockState) {
-//					ClockState.Off -> LocalContext.current.getString(R.string.start)
-//					ClockState.InRelax, ClockState.InRun, ClockState.InPause -> LocalContext.current.getString(
-//						R.string.stop
-//					)
-//				}).toUpperCase(Locale(Locale.current.toLanguageTag()))
-//			)
-//		}
-//		Button(
-//			modifier = Modifier
-//				.weight(1f)
-//				.padding(5.dp),
-//			enabled = clockState == ClockState.InRun || clockState == ClockState.InRelax || clockState == ClockState.InPause,
-//			onClick = { viewModel.pause() }
-//		) {
-//			Text(
-//				text = LocalContext.current.getString(R.string.pause)
-//					.toUpperCase(Locale(Locale.current.toLanguageTag()))
-//			)
-//		}
+@Composable
+fun IconBottomButton(imageVector: ImageVector,contentDescription:String, enabled: Boolean, modifier: Modifier, onClick:()->Unit) {
+	IconButton(
+		onClick = onClick,
+		enabled = enabled,
+		modifier = modifier
+			.padding(5.dp)
+			.background(MaterialTheme.colors.background, CircleShape)
+			.border(1.dp,MaterialTheme.colors.secondary.copy(alpha = LocalContentAlpha.current * if (enabled) 1f else 0.2f), CircleShape)
+	) {
+		Icon(
+			imageVector = imageVector,
+			contentDescription = contentDescription
+		)
 	}
 }
 

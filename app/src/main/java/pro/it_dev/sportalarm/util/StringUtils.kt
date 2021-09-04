@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 
 fun String.fromHtml():Spanned =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-        Html.fromHtml(this, Html.FROM_HTML_MODE_COMPACT)
+        Html.fromHtml(this, Html.FROM_HTML_MODE_LEGACY)
     else
         Html.fromHtml(this)
 
