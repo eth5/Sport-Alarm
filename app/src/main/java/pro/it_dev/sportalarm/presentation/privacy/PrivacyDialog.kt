@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,6 +21,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
+import kotlinx.coroutines.runBlocking
 import pro.it_dev.sportalarm.util.fromHtml
 
 
@@ -31,8 +35,8 @@ fun PrivacyDialog(onDismissRequest: () -> Unit) {
 	) {
 		Box(
 			modifier = Modifier
-				.background(MaterialTheme.colors.background, RoundedCornerShape(10.dp))
-				.shadow(0.dp, RoundedCornerShape(10.dp))
+				.background(MaterialTheme.colors.background, MaterialTheme.shapes.medium)
+				.border(1.dp, MaterialTheme.colors.secondary, MaterialTheme.shapes.medium)
 				.fillMaxWidth(1f)
 				.fillMaxHeight(0.8f),
 			contentAlignment = Center
@@ -46,24 +50,22 @@ fun PrivacyDialog(onDismissRequest: () -> Unit) {
 					dampingRatio = Spring.DampingRatioHighBouncy
 				)
 			)
-			LaunchedEffect(key1 = "", block = { size = 1f })
+			LaunchedEffect(Unit, block = { size = 1f })
 
 			Column(
 				modifier = Modifier.fillMaxSize(animation),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-
-				var privacyText by remember {
-					mutableStateOf("")
-				}
 				val ctx = LocalContext.current
-				LaunchedEffect(key1 = ctx){
-					privacyText = ctx.assets.open("123.txt")
+				val privacyText by produceState(initialValue = "") {
+					value = (Dispatchers.IO) { ctx.assets.open("123.txt")
 						.bufferedReader()
 						.use {
 							it.readText()
 						}
+					}
 				}
+
 				Text(
 					text = privacyText.fromHtml().toString(),
 					modifier = Modifier
