@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import pro.it_dev.sportalarm.domain.Clock
 import pro.it_dev.sportalarm.presentation.sound.ClockFx
-import pro.it_dev.sportalarm.presentation.sound.Sound
 import pro.it_dev.sportalarm.presentation.sound.SoundEvent
 import pro.it_dev.sportalarm.settings.Setting
 import pro.it_dev.sportalarm.util.longTimeToStringTime
@@ -54,15 +53,18 @@ class ClockViewModel: ViewModel() {
 		clock = Setting.getClockSetting().also {
 			_laps.value = it.laps
 		}
-		ClockFx.setClockFxEnableState(clock)
+		ClockFx.updateSoundEnabledState(clock)
 	}
 	private var job: Job?=null
 
 	fun start(){
-		viewModelScope.launch {
-			resetClockViewModelValues()
-			job?.cancelAndJoin()
+		if (clockState.value != ClockState.Off) return
+		clockState.value = ClockState.InRun
 
+
+		viewModelScope.launch {
+			job?.cancelAndJoin()
+			resetClockViewModelValues()
 
 			soundEvent.value = SoundEvent(listOf(ClockFx.Whistle))
 			delay(1000)

@@ -99,8 +99,7 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 							.fillMaxWidth(0.7f)
 							.fillMaxHeight(0.4f)
 							.padding(start = 12.dp, end = 12.dp)
-							.drawWithContent { if (readyToDraw) drawContent() }
-						,
+							.drawWithContent { if (readyToDraw) drawContent() },
 						textAlign = TextAlign.Center,
 						style = LocalTextStyle.current.copy(
 							fontSize = LocalTextStyle.current.fontSize * multiplier
@@ -128,7 +127,7 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 	}
 
 	val showConfig by remember { viewModel.showConfig }
-	if (showConfig) ConfigDialog() {
+	if (showConfig) ConfigDialog {
 		viewModel.showConfig(false)
 		viewModel.resetClockViewModelValues()
 	}
@@ -209,39 +208,6 @@ fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) 
 		) {
 			Icon(imageVector = Icons.Default.Stop, contentDescription = "Stop")
 		}
-
-//		Button(
-//			modifier = Modifier
-//				.weight(1f)
-//				.padding(5.dp),
-//			onClick = {
-//				when (clockState) {
-//					ClockState.Off -> viewModel.start()
-//					ClockState.InRun, ClockState.InRelax, ClockState.InPause -> viewModel.stop()
-//				}
-//			}
-//		) {
-//			Text(
-//				text = (when (clockState) {
-//					ClockState.Off -> LocalContext.current.getString(R.string.start)
-//					ClockState.InRelax, ClockState.InRun, ClockState.InPause -> LocalContext.current.getString(
-//						R.string.stop
-//					)
-//				}).toUpperCase(Locale(Locale.current.toLanguageTag()))
-//			)
-//		}
-//		Button(
-//			modifier = Modifier
-//				.weight(1f)
-//				.padding(5.dp),
-//			enabled = clockState == ClockState.InRun || clockState == ClockState.InRelax || clockState == ClockState.InPause,
-//			onClick = { viewModel.pause() }
-//		) {
-//			Text(
-//				text = LocalContext.current.getString(R.string.pause)
-//					.toUpperCase(Locale(Locale.current.toLanguageTag()))
-//			)
-//		}
 	}
 }
 
