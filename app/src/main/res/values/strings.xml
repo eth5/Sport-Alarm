@@ -12,5 +12,11 @@
     <string name="cancel">Cancel</string>
     <string name="volume">Volume</string>
     <string name="test">Test</string>
+    <string name="whistling">Whistling</string>
+    <string name="voice">Voice</string>
+    <string name="beep">Beep</string>
+    <string name="laps">Laps</string>
+    <string name="min">Min</string>
+    <string name="sec">Sec</string>
 
 </resources>

@@ -145,6 +145,7 @@ fun ConfigSetting(viewModel: ConfigViewModel) {
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Center
 	) {
+		val ctx = LocalContext.current
 		Box (
 			modifier = Modifier
 				.padding(horizontal = 2.dp, vertical = 10.dp)
@@ -153,6 +154,7 @@ fun ConfigSetting(viewModel: ConfigViewModel) {
 				.background(color = MaterialTheme.colors.background, CircleShape),
 			contentAlignment = Center
 		){
+
 			val volume by remember { viewModel.volume }
 			Slider(
 				value = volume,
@@ -166,7 +168,7 @@ fun ConfigSetting(viewModel: ConfigViewModel) {
 		}
 		EditField(
 			stateValue = viewModel.laps,
-			label = { Text(text = "Laps") },
+			label = { Text(text = ctx.getString(R.string.laps)) },
 			keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 			onChangeSetter = {
 				if (it.length < 9) viewModel.laps.value = viewModel.convertStringValueToInt(it)
@@ -176,7 +178,7 @@ fun ConfigSetting(viewModel: ConfigViewModel) {
 		Row (verticalAlignment = Alignment.CenterVertically){
 			EditField(
 				stateValue = viewModel.min,
-				label = { Text(text = "Min") },
+				label = { Text(text = ctx.getString(R.string.min)) },
 				modifier = Modifier.weight(1f),
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 				onChangeSetter = {
@@ -186,7 +188,7 @@ fun ConfigSetting(viewModel: ConfigViewModel) {
 			Text(text = ":")
 			EditField(
 				stateValue = viewModel.sec,
-				label = { Text(text = "Sec") },
+				label = { Text(text = ctx.getString(R.string.sec)) },
 				modifier = Modifier.weight(1f),
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 				onChangeSetter = {
@@ -198,7 +200,7 @@ fun ConfigSetting(viewModel: ConfigViewModel) {
 		Row (verticalAlignment = Alignment.CenterVertically){
 			EditField(
 				stateValue = viewModel.pauseMin,
-				label = { Text(text = "Min") },
+				label = { Text(text = ctx.getString(R.string.min)) },
 				modifier = Modifier.weight(1f),
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 				onChangeSetter = { if (it.length < 9) viewModel.pauseMin.value = viewModel.convertStringValueToLong(it) }
@@ -206,29 +208,30 @@ fun ConfigSetting(viewModel: ConfigViewModel) {
 			Text(text = ":")
 			EditField(
 				stateValue = viewModel.pauseSec,
-				label = { Text(text = "Sec") },
+				label = { Text(text = ctx.getString(R.string.sec)) },
 				modifier = Modifier.weight(1f),
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 				onChangeSetter = { if (it.length < 9) viewModel.pauseSec.value = viewModel.convertStringValueToLong(it) }
 			)
 		}
+
 		LabeledCheckBox(
 			value = viewModel.whistling,
-			label = "Whistling",
+			label = ctx.getString(R.string.whistling),
 			modifier = Modifier
 				.align(Start)
 				.padding(10.dp),
 			onChange = { viewModel.whistling.value = it })
 		LabeledCheckBox(
 			value = viewModel.voice,
-			label = "Voice",
+			label = ctx.getString(R.string.voice),
 			modifier = Modifier
 				.align(Start)
 				.padding(10.dp),
 			onChange = { viewModel.voice.value = it })
 		LabeledCheckBox(
 			value = viewModel.beep,
-			label = "Beep",
+			label = ctx.getString(R.string.beep),
 			modifier = Modifier
 				.align(Start)
 				.padding(10.dp),
