@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -180,7 +181,6 @@ fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) 
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
-			//.background(MaterialTheme.colors.surface)
 			.height(
 				animationDp(
 					start = 0.dp, target = 100.dp, animationSpec = spring(
@@ -191,43 +191,44 @@ fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) 
 			.padding(5.dp),
 		verticalAlignment = Alignment.Top
 	) {
-
-		IconButton(
-			onClick = { viewModel.start() },
+		IconBottomButton(
+			imageVector = Icons.Default.PlayArrow,
+			contentDescription = "Play",
 			enabled = clockState == ClockState.Off,
-			modifier = Modifier
-				.weight(1f)
-				.padding(5.dp)
-				.background(MaterialTheme.colors.surface, CircleShape)
-		) {
-			Icon(
-				imageVector = Icons.Default.PlayArrow,
-				contentDescription = "Play"
-			)
-		}
-		IconButton(
-			onClick = { viewModel.pause() },
+			modifier = Modifier.weight(1f),
+			onClick = { viewModel.start() }
+		)
+		IconBottomButton(
+			imageVector = Icons.Default.Pause,
+			contentDescription = "Pause",
 			enabled = clockState != ClockState.Off,
-			modifier = Modifier
-				.weight(1f)
-				.padding(5.dp)
-				.background(MaterialTheme.colors.surface, CircleShape)
-		) {
-			Icon(
-				imageVector = Icons.Default.Pause,
-				contentDescription = "Play"
-			)
-		}
-		IconButton(
-			onClick = { viewModel.stop() },
+			modifier = Modifier.weight(1f),
+			onClick = { viewModel.pause() }
+		)
+		IconBottomButton(
+			imageVector = Icons.Default.Stop,
+			contentDescription = "Stop",
 			enabled = clockState != ClockState.Off,
-			modifier = Modifier
-				.weight(1f)
-				.padding(5.dp)
-				.background(MaterialTheme.colors.surface, CircleShape)
-		) {
-			Icon(imageVector = Icons.Default.Stop, contentDescription = "Stop")
-		}
+			modifier = Modifier.weight(1f),
+			onClick = { viewModel.stop() }
+		)
+	}
+}
+
+@Composable
+fun IconBottomButton(imageVector: ImageVector,contentDescription:String, enabled: Boolean, modifier: Modifier, onClick:()->Unit) {
+	IconButton(
+		onClick = onClick,
+		enabled = enabled,
+		modifier = modifier
+			.padding(5.dp)
+			.background(MaterialTheme.colors.background, CircleShape)
+			.border(1.dp,MaterialTheme.colors.secondary.copy(alpha = LocalContentAlpha.current * if (enabled) 1f else 0.2f), CircleShape)
+	) {
+		Icon(
+			imageVector = imageVector,
+			contentDescription = contentDescription
+		)
 	}
 }
 
