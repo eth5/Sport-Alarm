@@ -13,14 +13,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Alarm
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -32,8 +31,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import pro.it_dev.sportalarm.R
 import pro.it_dev.sportalarm.presentation.config.ConfigDialog
 import pro.it_dev.sportalarm.presentation.sound.Sound
+import pro.it_dev.sportalarm.presentation.sound.SoundEvent
 
 @Composable
 fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
@@ -60,6 +61,7 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 					.align(Alignment.BottomCenter),
 				contentAlignment = Alignment.Center
 			) {
+
 				Column(
 					modifier = Modifier,
 					verticalArrangement = Arrangement.Top,
@@ -132,17 +134,32 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 		viewModel.resetClockViewModelValues()
 	}
 
+//	val soundEvent by remember {
+//		viewModel.soundEvent
+//	}
+//	if (soundEvent != null) {
+//		LaunchedEffect(key1 = soundEvent) {
+//			soundEvent!!.list.forEach {
+//				if (it.enable) sound.play(it.path, soundEvent!!.rate)
+//			}
+//		}
+//	}
+	PlaySoundEvent(soundEventState = viewModel.soundEvent, sound = sound)
+}
+
+@Composable
+fun PlaySoundEvent(soundEventState: State<SoundEvent?>, sound: Sound) {
 	val soundEvent by remember {
-		viewModel.soundEvent
+		soundEventState
 	}
 	if (soundEvent != null) {
 		LaunchedEffect(key1 = soundEvent) {
+			val volume = soundEvent!!.volume
 			soundEvent!!.list.forEach {
-				if (it.enable) sound.play(it.path, soundEvent!!.rate)
+				if (it.enable) sound.play(it.path,volume, soundEvent!!.rate)
 			}
 		}
 	}
-
 }
 
 @Composable
@@ -179,7 +196,8 @@ fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) 
 			onClick = { viewModel.start() },
 			enabled = clockState == ClockState.Off,
 			modifier = Modifier
-				.weight(1f).padding(5.dp)
+				.weight(1f)
+				.padding(5.dp)
 				.background(MaterialTheme.colors.surface, CircleShape)
 		) {
 			Icon(
@@ -191,7 +209,8 @@ fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) 
 			onClick = { viewModel.pause() },
 			enabled = clockState != ClockState.Off,
 			modifier = Modifier
-				.weight(1f).padding(5.dp)
+				.weight(1f)
+				.padding(5.dp)
 				.background(MaterialTheme.colors.surface, CircleShape)
 		) {
 			Icon(
@@ -203,7 +222,8 @@ fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) 
 			onClick = { viewModel.stop() },
 			enabled = clockState != ClockState.Off,
 			modifier = Modifier
-				.weight(1f).padding(5.dp)
+				.weight(1f)
+				.padding(5.dp)
 				.background(MaterialTheme.colors.surface, CircleShape)
 		) {
 			Icon(imageVector = Icons.Default.Stop, contentDescription = "Stop")

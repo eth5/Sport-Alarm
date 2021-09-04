@@ -11,6 +11,7 @@ object Setting {
 	private const val BEEP = "beep"
 	private const val WHISTLING = "whistling"
 	private const val VOICE = "voice"
+	private const val VOLUME = "volume"
 
 	private lateinit var config:SharedPreferences
 
@@ -24,6 +25,7 @@ object Setting {
 			whistling = config.getBoolean(WHISTLING, true)
 			voice = config.getBoolean(VOICE, true)
 			beep = config.getBoolean(BEEP, true)
+			volume = config.getFloat(VOLUME,1f)
 
 			workTime = config.getLong(WORK_TIME, 60)
 			pauseTime = config.getLong(PAUSE_TIME, 20)
@@ -35,6 +37,7 @@ object Setting {
 		editor.putBoolean(WHISTLING, clock.whistling)
 		editor.putBoolean(VOICE, clock.voice)
 		editor.putBoolean(BEEP, clock.beep)
+		editor.putFloat(VOLUME,clock.volume)
 
 		editor.putLong(WORK_TIME,clock.workTime)
 		editor.putLong(PAUSE_TIME,clock.pauseTime)

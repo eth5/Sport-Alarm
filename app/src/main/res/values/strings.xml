@@ -10,5 +10,7 @@
     <string name="pause_time">Pause time</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="volume">Volume</string>
+    <string name="test">Test</string>
 
 </resources>

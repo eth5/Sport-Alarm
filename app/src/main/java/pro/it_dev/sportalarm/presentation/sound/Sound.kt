@@ -17,9 +17,9 @@ class Sound() {
 		}
 	}
 
-	fun play(file:String, rate:Float = 1f){
+	fun play(file:String, volume: Float, rate:Float = 1f){
 		val soundId = map[file] ?: throw NullPointerException("")
-		sp.play(soundId,1f,1f,0,0,rate)
+		sp.play(soundId,volume,volume,0,0,rate)
 	}
 
 	fun destroy(){

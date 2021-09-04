@@ -1,5 +1,6 @@
 package pro.it_dev.sportalarm.presentation.config
 
+import android.widget.Toast
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -29,10 +30,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pro.it_dev.sportalarm.R
-import pro.it_dev.sportalarm.domain.Clock
+import pro.it_dev.sportalarm.presentation.sound.Sound
+import pro.it_dev.sportalarm.util.Message
 import pro.it_dev.sportalarm.util.Resource
 
-
+//todo Add soundPlayer by di for test play
 @Composable
 fun ConfigDialog(viewModel: ConfigViewModel = viewModel(), onDismissRequest:()->Unit) {
 	Dialog(
@@ -55,7 +57,7 @@ fun ConfigDialog(viewModel: ConfigViewModel = viewModel(), onDismissRequest:()->
 					dampingRatio = Spring.DampingRatioHighBouncy
 				)
 			)
-			LaunchedEffect(key1 = "", block = {size=1f})
+			LaunchedEffect(Unit, block = {size=1f})
 			Column(modifier = Modifier
 				.fillMaxSize(animation)
 				.background(color = MaterialTheme.colors.background, RoundedCornerShape(10.dp))
@@ -114,7 +116,23 @@ fun ConfigDialog(viewModel: ConfigViewModel = viewModel(), onDismissRequest:()->
 			}
 
 		}
+		ToastMessage(messageState = viewModel.popUpMsg)
+	}
+}
 
+@Composable
+fun ToastMessage(messageState: MutableState<Message?>) {
+	val message by remember { messageState }
+	val ctx = LocalContext.current
+	if (message != null) {
+		DisposableEffect(message){
+			val toast = Toast.makeText(ctx, message?.text ?: "error msg", Toast.LENGTH_SHORT)
+			toast.show()
+			messageState.value = null
+			onDispose {
+				toast.cancel()
+			}
+		}
 	}
 }
 
@@ -127,6 +145,25 @@ fun ConfigSetting(viewModel: ConfigViewModel) {
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Center
 	) {
+		Box (
+			modifier = Modifier
+				.padding(horizontal = 2.dp, vertical = 10.dp)
+				.border(1.dp, MaterialTheme.colors.secondary, CircleShape)
+				.shadow(2.dp, CircleShape)
+				.background(color = MaterialTheme.colors.background, CircleShape),
+			contentAlignment = Center
+		){
+			val volume by remember { viewModel.volume }
+			Slider(
+				value = volume,
+				valueRange = 0f..1f,
+				modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
+				onValueChange = {
+					viewModel.setVolume(it)
+				}
+
+			)
+		}
 		EditField(
 			stateValue = viewModel.laps,
 			label = { Text(text = "Laps") },
