@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "pro.it_dev.sportalarm"
         minSdk 21
-        targetSdk 30
+        targetSdk 31
         versionCode 3
         versionName "1.0"
 
@@ -72,4 +72,7 @@ dependencies {
 
     //admob
     implementation 'com.google.android.gms:play-services-ads:20.4.0'
+
+    // required to avoid crash on Android 12 API 31
+    implementation 'androidx.work:work-runtime-ktx:2.7.0-rc01'
 }
