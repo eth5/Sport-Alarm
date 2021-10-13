@@ -291,11 +291,7 @@ fun <T> EditField(
 			.shadow(2.dp, CircleShape)
 			.background(color = MaterialTheme.colors.background, CircleShape)
 			.onFocusChanged {
-				borderSize = if (it.isFocused) {
-					3.dp
-				} else {
-					1.dp
-				}
+				borderSize = if (it.isFocused) 3.dp else 1.dp
 			},
 		maxLines = maxLines,
 		textStyle = TextStyle(
