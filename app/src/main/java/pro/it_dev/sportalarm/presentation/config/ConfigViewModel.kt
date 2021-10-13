@@ -10,7 +10,7 @@ import pro.it_dev.sportalarm.util.Resource
 
 class ConfigViewModel: ViewModel() {
 
-	val popUpMsg = mutableStateOf<Message?>(null)
+	val popUpMsg = mutableStateOf<String?>(null)
 
 	val laps= mutableStateOf(0)
 	val min = mutableStateOf(0L)
@@ -64,7 +64,7 @@ class ConfigViewModel: ViewModel() {
 
 	fun setVolume(volumeValue: Float){
 		_volume.value = volumeValue.coerceIn(0f,1f)
-		popUpMsg.value = Message("Volume ${(_volume.value * 100).toInt()}")
+		popUpMsg.value = "Volume ${(_volume.value * 100).toInt()}"
 		println("Volume ${(_volume.value * 100).toInt()}")
 
 	}
