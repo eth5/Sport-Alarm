@@ -1,6 +1,7 @@
 package pro.it_dev.sportalarm.presentation.screens
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -18,8 +19,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -32,7 +31,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import pro.it_dev.sportalarm.R
 import pro.it_dev.sportalarm.presentation.config.ConfigDialog
 import pro.it_dev.sportalarm.presentation.sound.Sound
 import pro.it_dev.sportalarm.presentation.sound.SoundEvent
@@ -45,7 +43,7 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
-		val clockState by remember { viewModel.clockState }
+
 
 		Box(
 			modifier = Modifier
@@ -62,97 +60,50 @@ fun ClockScreen(sound: Sound, viewModel: ClockViewModel = viewModel()) {
 					.align(Alignment.BottomCenter),
 				contentAlignment = Alignment.Center
 			) {
-
 				Column(
 					modifier = Modifier,
 					verticalArrangement = Arrangement.Top,
 					horizontalAlignment = Alignment.CenterHorizontally
 				) {
-					val currentLap by viewModel.currenLap
-					Text(
-						text = "Lap $currentLap of ${viewModel.laps.value}",
-						color = MaterialTheme.colors.primary,
-						fontSize = 20.sp,
-						fontWeight = FontWeight.Bold,
-						modifier = Modifier.padding(top = 8.dp)
-					)
-
-					val text = when (clockState) {
-						ClockState.Off -> "Off" to Color.Black
-						ClockState.InRelax -> "Relax time!" to Color.Green
-						ClockState.InRun -> "Work time!" to Color.Red
-						ClockState.InPause -> "Pause!" to Color.Red
-					}
-					Text(
-						text = text.first,
-						fontWeight = FontWeight.Bold,
-						color = Color.Black
-					)
-
-					val timeText by remember { viewModel.timeText }
-					var multiplier by remember { mutableStateOf(5f) }
-					var readyToDraw by remember { mutableStateOf(false) }
-					Text(
-						text = timeText,
-						color = text.second,
-						maxLines = 1,
-						overflow = TextOverflow.Visible,
-						modifier = Modifier
-							.border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-							.fillMaxWidth(0.7f)
-							.fillMaxHeight(0.4f)
-							.padding(start = 12.dp, end = 12.dp)
-							.drawWithContent { if (readyToDraw) drawContent() },
-						textAlign = TextAlign.Center,
-						style = LocalTextStyle.current.copy(
-							fontSize = LocalTextStyle.current.fontSize * multiplier
-						),
-						onTextLayout = {
-							if (it.hasVisualOverflow) multiplier *= 0.99f
-							else readyToDraw = true
-						}
-
-					)
-					IconButton(onClick = { viewModel.showConfig(true) }) {
-						Icon(
-							imageVector = Icons.Default.Alarm,
-							contentDescription = "Config",
-							tint = Color.Black,
-							modifier = Modifier
-								.size(40.dp)
-							//.align(Alignment.BottomCenter)
-						)
-					}
+					UpdateViewData(viewModel = viewModel)
+					ShowIconButton(viewModel = viewModel)
 				}
 			}
 		}
-		ClockHandleBottomButtons(clockState = clockState, viewModel = viewModel)
+
+		ClockHandleBottomButtons(viewModel = viewModel)
 	}
 
-	val showConfig by remember { viewModel.showConfig }
+
+	ShowConfigDialog(viewModel = viewModel)
+	PlaySoundEvent(viewModel.soundEvent, sound = sound)
+}
+
+@Composable
+fun ShowIconButton(viewModel: ClockViewModel){
+	IconButton(onClick = { viewModel.showConfig(true) }) {
+		Icon(
+			imageVector = Icons.Default.Alarm,
+			contentDescription = "Config",
+			tint = Color.Gray,
+			modifier = Modifier
+				.size(40.dp)
+		)
+	}
+}
+
+@Composable
+fun ShowConfigDialog(viewModel: ClockViewModel){
+	val showConfig by viewModel.showConfig
 	if (showConfig) ConfigDialog {
 		viewModel.showConfig(false)
 		viewModel.resetClockViewModelValues()
 	}
-
-//	val soundEvent by remember {
-//		viewModel.soundEvent
-//	}
-//	if (soundEvent != null) {
-//		LaunchedEffect(key1 = soundEvent) {
-//			soundEvent!!.list.forEach {
-//				if (it.enable) sound.play(it.path, soundEvent!!.rate)
-//			}
-//		}
-//	}
-	PlaySoundEvent(soundEventState = viewModel.soundEvent, sound = sound)
 }
 
 @Composable
 fun PlaySoundEvent(soundEventState: State<SoundEvent?>, sound: Sound) {
-	val soundEvent by remember {
-		soundEventState
-	}
+	val soundEvent by soundEventState
 	if (soundEvent != null) {
 		LaunchedEffect(key1 = soundEvent) {
 			val volume = soundEvent!!.volume
@@ -161,6 +112,76 @@ fun PlaySoundEvent(soundEventState: State<SoundEvent?>, sound: Sound) {
 			}
 		}
 	}
+}
+
+
+@Composable
+fun UpdateViewData(viewModel: ClockViewModel){
+	ShowLaps(viewModel = viewModel)
+	ShowState(viewModel = viewModel)
+	ShowTime(viewModel = viewModel)
+}
+
+private val sb = StringBuilder();
+@Composable
+private fun ShowLaps(viewModel: ClockViewModel){
+	val laps by viewModel.laps;
+	val currentLap by viewModel.currentLap
+	sb.clear()
+
+	Text(
+		text = sb.append("Lap ").append(currentLap).append(" of ").append(laps).toString(),
+		color = MaterialTheme.colors.primary,
+		fontSize = 20.sp,
+		fontWeight = FontWeight.Bold,
+		modifier = Modifier.padding(top = 8.dp)
+	)
+}
+
+@Composable
+private fun ShowTime(viewModel: ClockViewModel){
+	val clockState by viewModel.clockState
+	val timeText by viewModel.timeText
+	var multiplier by remember { mutableStateOf(5f) }
+	var readyToDraw by remember { mutableStateOf(false) }
+	Text(
+		text = timeText,
+		color = clockState.color,
+		maxLines = 1,
+		overflow = TextOverflow.Visible,
+		modifier = Modifier
+			.border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+			.fillMaxWidth(0.7f)
+			.fillMaxHeight(0.4f)
+			.padding(start = 12.dp, end = 12.dp)
+			.drawWithContent { if (readyToDraw) drawContent() },
+		textAlign = TextAlign.Center,
+		style = LocalTextStyle.current.copy(
+			fontSize = LocalTextStyle.current.fontSize * multiplier
+		),
+		onTextLayout = {
+			if (it.hasVisualOverflow) multiplier *= 0.99f
+			else readyToDraw = true
+		}
+
+	)
+}
+
+@Composable
+private fun ShowState(viewModel: ClockViewModel){
+	val clockState by viewModel.clockState
+	val text = when (clockState) {
+		ClockState.Off -> "Off"
+		ClockState.InRelax -> "Relax time!"
+		ClockState.InRun -> "Work time!"
+		ClockState.InPause -> "Pause!"
+	}
+
+	Text(
+		text = text,
+		fontWeight = FontWeight.Bold,
+		color = Color.Black
+	)
 }
 
 @Composable
@@ -177,7 +198,8 @@ fun animationDp(start: Dp, target: Dp, animationSpec: AnimationSpec<Dp>): Dp {
 }
 
 @Composable
-fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) {
+fun ClockHandleBottomButtons(viewModel: ClockViewModel) {
+	val clockStateValue by viewModel.clockState
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -194,21 +216,21 @@ fun ClockHandleBottomButtons(clockState: ClockState, viewModel: ClockViewModel) 
 		IconBottomButton(
 			imageVector = Icons.Default.PlayArrow,
 			contentDescription = "Play",
-			enabled = clockState == ClockState.Off,
+			enabled = clockStateValue == ClockState.Off,
 			modifier = Modifier.weight(1f),
 			onClick = { viewModel.start() }
 		)
 		IconBottomButton(
 			imageVector = Icons.Default.Pause,
 			contentDescription = "Pause",
-			enabled = clockState != ClockState.Off,
+			enabled = clockStateValue != ClockState.Off,
 			modifier = Modifier.weight(1f),
 			onClick = { viewModel.pause() }
 		)
 		IconBottomButton(
 			imageVector = Icons.Default.Stop,
 			contentDescription = "Stop",
-			enabled = clockState != ClockState.Off,
+			enabled = clockStateValue != ClockState.Off,
 			modifier = Modifier.weight(1f),
 			onClick = { viewModel.stop() }
 		)
@@ -223,7 +245,11 @@ fun IconBottomButton(imageVector: ImageVector,contentDescription:String, enabled
 		modifier = modifier
 			.padding(5.dp)
 			.background(MaterialTheme.colors.background, CircleShape)
-			.border(1.dp,MaterialTheme.colors.secondary.copy(alpha = LocalContentAlpha.current * if (enabled) 1f else 0.2f), CircleShape)
+			.border(
+				1.dp,
+				MaterialTheme.colors.secondary.copy(alpha = LocalContentAlpha.current * if (enabled) 1f else 0.2f),
+				CircleShape
+			)
 	) {
 		Icon(
 			imageVector = imageVector,
