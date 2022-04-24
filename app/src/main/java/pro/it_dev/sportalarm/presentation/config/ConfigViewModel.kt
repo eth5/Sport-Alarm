@@ -38,6 +38,7 @@ class ConfigViewModel: ViewModel() {
 		_volume.value = clock.volume
 		return Resource.Success(true)
 	}
+
 	fun saveClock(){
 		val clock = Clock().apply {
 			laps = (this@ConfigViewModel.laps.value).coerceAtMost(99)
@@ -66,6 +67,5 @@ class ConfigViewModel: ViewModel() {
 		_volume.value = volumeValue.coerceIn(0f,1f)
 		popUpMsg.value = "Volume ${(_volume.value * 100).toInt()}"
 		println("Volume ${(_volume.value * 100).toInt()}")
-
 	}
 }

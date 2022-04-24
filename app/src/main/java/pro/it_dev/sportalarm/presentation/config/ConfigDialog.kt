@@ -52,15 +52,13 @@ fun ConfigDialog(viewModel: ConfigViewModel = viewModel(), onDismissRequest: () 
                 .fillMaxHeight(0.8f)
                 .fillMaxWidth(1f)
                 .border(1.dp, MaterialTheme.colors.secondary, MaterialTheme.shapes.medium)
-                .clip(MaterialTheme.shapes.medium)
-            ,
+                .clip(MaterialTheme.shapes.medium),
         ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Center
-        ) {
-
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Center
+            ) {
                 var size by remember {
                     mutableStateOf(0f)
                 }
@@ -81,7 +79,7 @@ fun ConfigDialog(viewModel: ConfigViewModel = viewModel(), onDismissRequest: () 
                         .shadow(0.dp, RoundedCornerShape(10.dp))
                 ) {
                     Text(
-                        text = "Config",
+                        text = LocalContext.current.getString(R.string.config),
                         color = MaterialTheme.colors.primary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
@@ -90,9 +88,7 @@ fun ConfigDialog(viewModel: ConfigViewModel = viewModel(), onDismissRequest: () 
                             .padding(start = 5.dp)
                             .align(CenterHorizontally)
                     )
-                    val clockState by produceState<Resource<Boolean>>(initialValue = Resource.Loading()) {
-                        value = viewModel.getClock()
-                    }
+
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -101,46 +97,69 @@ fun ConfigDialog(viewModel: ConfigViewModel = viewModel(), onDismissRequest: () 
                         contentAlignment = Alignment.Center
 
                     ) {
-                        when (clockState) {
-                            is Resource.Loading -> CircularProgressIndicator()
-                            is Resource.Success -> ConfigSetting(viewModel)
-                            is Resource.Error -> Text(
-                                text = clockState.message ?: "Unknown error",
-                                color = Color.Red
-                            )
-                        }
+                        ShowSettingContent(viewModel = viewModel)
                     }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
-                    ) {
-                        TextButton(
-                            onClick = {
-                                viewModel.saveClock()
-                                onDismissRequest()
-                            },
-                            enabled = clockState is Resource.Success,
-                            modifier = Modifier
-                                .weight(1f)
-                        ) {
-                            Text(text = LocalContext.current.getString(R.string.save))
-                        }
-                        TextButton(
-                            onClick = { onDismissRequest() },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(text = LocalContext.current.getString(R.string.cancel))
-                        }
-                    }
+                    ShowFooter(viewModel = viewModel, onDismissRequest = onDismissRequest)
                 }
 
             }
-
-            SnackbarSimpleMessage(viewModel.popUpMsg, scaffoldState, scope, SnackbarDuration.Short)
         }
 
+        SnackbarSimpleMessage(viewModel.popUpMsg, scaffoldState, scope, SnackbarDuration.Short)
+    }
+
+}
+
+
+@Composable
+private fun ShowSettingContent(viewModel: ConfigViewModel, ) {
+    val clockState by produceState<Resource<Boolean>>(initialValue = Resource.Loading()) {
+        value = viewModel.getClock()
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(1f)
+            .padding(start = 16.dp, end = 16.dp),
+        contentAlignment = Alignment.Center
+
+    ) {
+        when (clockState) {
+            is Resource.Loading -> CircularProgressIndicator()
+            is Resource.Success -> ConfigSetting(viewModel)
+            is Resource.Error -> Text(
+                text = clockState.message ?: "Unknown error",
+                color = Color.Red
+            )
+        }
+    }
+}
+
+@Composable fun ShowFooter(viewModel: ConfigViewModel, onDismissRequest: () -> Unit){
+    val clockState by produceState<Resource<Boolean>>(initialValue = Resource.Loading()) {
+        value = viewModel.getClock()
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        TextButton(
+            onClick = {
+                viewModel.saveClock()
+                onDismissRequest()
+            },
+            enabled = clockState is Resource.Success,
+            modifier = Modifier
+                .weight(1f)
+        ) {
+            Text(text = LocalContext.current.getString(R.string.save))
+        }
+        TextButton(
+            onClick = { onDismissRequest() },
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(text = LocalContext.current.getString(R.string.cancel))
+        }
     }
 }
 
